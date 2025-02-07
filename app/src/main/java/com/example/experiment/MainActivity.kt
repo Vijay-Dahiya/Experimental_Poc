@@ -85,6 +85,7 @@ class MainActivity : ComponentActivity() {
     private val voiceToTextParser by lazy {
         VoiceToTextParser(this.application)
     }
+    val trainColor = Color(0xFFFF820E).copy(alpha = 0.1f)
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -167,34 +168,14 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
-                    .padding(horizontal = 8.dp)
+                    .padding(horizontal = 16.dp)
             ) {
-                if (trainDays != 0) {
-                    Canvas(
-                        modifier = Modifier.matchParentSize()
-                    ) {
-                        val totalSpacingPx = daySpacing.toPx() * 6
-                        val rowWidthPx = size.width
-                        val dayWidthPx = (rowWidthPx - totalSpacingPx) / 7
-                        val tintedWidth = (trainDays * dayWidthPx) + ((trainDays - 1) * daySpacing.toPx())
-
-                        val cornerRadius = size.height / 2f
-
-                        drawRoundRect(
-                            color = Color(0xffff820E).copy(alpha = 0.1f),
-                            topLeft = Offset(x = 0f, y = 0f),
-                            size = Size(width = tintedWidth + sizeIncrement.toPx(), height = size.height),
-                            cornerRadius = CornerRadius(cornerRadius, cornerRadius)
-                        )
-                    }
-                }
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .align(Alignment.Center)
                         .defaultMinSize(minHeight = 40.dp)
-                        .padding(horizontal = 8.dp)
                         .wrapContentHeight(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(daySpacing)
@@ -204,7 +185,31 @@ class MainActivity : ComponentActivity() {
                         val isToday = (date == today)
 
                         Box(
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(
+
+                                    if (index == 0) {
+                                        RoundedCornerShape(
+                                            topStart = 15.dp,
+                                            bottomStart = 15.dp,
+                                            topEnd = 0.dp,
+                                            bottomEnd = 0.dp
+                                        )
+                                    } else if (index == trainDays-1) {
+                                        RoundedCornerShape(
+                                            topStart = 0.dp,
+                                            bottomStart = 0.dp,
+                                            topEnd = 15.dp,
+                                            bottomEnd = 15.dp
+                                        )
+                                    }
+                                    else {
+                                       RoundedCornerShape(0.dp)
+                                    }
+                                )
+                                .background(if (index in 0..<trainDays) trainColor else Color.Transparent)
+                            ,
                             contentAlignment = Alignment.Center
                         ) {
                             if (trainDays > index) {
