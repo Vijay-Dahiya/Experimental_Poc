@@ -132,17 +132,14 @@ class MainActivity : ComponentActivity() {
         val today = LocalDate.now()
 
         val daySpacing = 8.dp
-        val sizeIncrement = if(trainDays==7)0.dp else 6.dp
         Column(
             modifier = modifier
                 .padding(vertical = 14.dp)
-                .wrapContentHeight()
                 .fillMaxWidth()
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .wrapContentHeight()
                     .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(daySpacing)
             ) {
@@ -164,69 +161,47 @@ class MainActivity : ComponentActivity() {
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            Box(
+
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
             ) {
+                weekDates.forEachIndexed { index, date ->
+                    val dateNumber = date.dayOfMonth.toString()
+                    val isToday = (date == today)
+                    val isTrain = (index < trainDays)
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.Center)
-                        .defaultMinSize(minHeight = 40.dp)
-                        .wrapContentHeight(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(daySpacing)
-                ) {
-                    weekDates.forEachIndexed { index, date ->
-                        val dateNumber = date.dayOfMonth.toString()
-                        val isToday = (date == today)
+                    val shape = when {
+                        isTrain && index == 0 -> RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp)
+                        isTrain && index == trainDays - 1 -> RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp)
+                        else -> RoundedCornerShape(0.dp)
+                    }
 
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clip(
-
-                                    if (index == 0) {
-                                        RoundedCornerShape(
-                                            topStart = 15.dp,
-                                            bottomStart = 15.dp,
-                                            topEnd = 0.dp,
-                                            bottomEnd = 0.dp
-                                        )
-                                    } else if (index == trainDays-1) {
-                                        RoundedCornerShape(
-                                            topStart = 0.dp,
-                                            bottomStart = 0.dp,
-                                            topEnd = 15.dp,
-                                            bottomEnd = 15.dp
-                                        )
-                                    }
-                                    else {
-                                       RoundedCornerShape(0.dp)
-                                    }
-                                )
-                                .background(if (index in 0..<trainDays) trainColor else Color.Transparent)
-                            ,
-                            contentAlignment = Alignment.Center
-                        ) {
-                            if (trainDays > index) {
-                                Image(
-                                    modifier = Modifier.padding(vertical = 6.dp),
-                                    painter = painterResource(R.drawable.streak_component),
-                                    contentDescription = ""
-                                )
-                            }
-                            else {
-                                Text(
-                                    text = dateNumber,
-                                    fontSize = 16.sp,
-                                    textAlign = TextAlign.Center,
-                                    color = if (isToday) Color(0xFFFF8A00) else Color.Gray
-                                )
-                            }
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(
+                                color = if (isTrain) Color(0xFFFF820E).copy(alpha = 0.1f) else Color.Transparent,
+                                shape = shape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (isTrain) {
+                            Image(
+                                painter = painterResource(R.drawable.streak_component),
+                                contentDescription = null,
+                                modifier = Modifier.padding(vertical = 6.dp)
+                            )
+                        } else {
+                            Text(
+                                text = dateNumber,
+                                fontSize = 16.sp,
+                                textAlign = TextAlign.Center,
+                                color = if (isToday) Color(0xFFFF8A00) else Color.Gray
+                            )
                         }
                     }
                 }
